@@ -19,6 +19,7 @@ function printUsage() {
 
 async function createSPFMObjects() {
   const ports = await SPFM.list();
+  console.info(ports);
   if (ports.length === 0) {
     console.log("Missing serial device");
     process.exit(0);
@@ -42,10 +43,9 @@ async function createSPFMObjects() {
 function loadVgm(input: string) {
   let vgmContext: Buffer;
   const buf = fs.readFileSync(input);
-  const m = input.match(/(.*)\.vgz$/);
-  if (m) {
+  try {
     vgmContext = zlib.gunzipSync(buf);
-  } else {
+  } catch (e) {
     vgmContext = buf;
   }
   return VGMParser.parse(vgmContext!.buffer);
