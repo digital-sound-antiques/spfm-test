@@ -1,11 +1,19 @@
 # SPFM-TEST
 
 A study of VGM player program for [SPFM Light] implemented with TypeScript.
-It is tested only with node v11.15.0 on macOS 10.14.4, SPFM Light with YM2413, AY8910 and YM2203 module.
+It is tested only with:
+- node v11.15.0 on macOS 10.14.4
+- node v10.10.0 on Windows 10
+- SPFM Light
+- Re:Birth YM2413, AY8910 and YM2203 module.
 Currently this may not work with node v12.x.
 
 TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタディです。
-テストは mac OS 10.14.4 上の node v11.15.0、SPFM Light の YM2413, AY8910, YM2203 モジュールでのみ行っています。
+テストは以下の環境でのみ行っています。
+- mac OS 10.14.4 & node v11.15.0
+- node v10.10.0 on Windows 10
+- SPFM Light
+- Re:Birth YM2413, AY8910, YM2203 モジュール。
 現在、node v12.x には対応していません。
 
 [spfm light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
