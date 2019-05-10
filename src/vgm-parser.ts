@@ -21,7 +21,7 @@ function getParamsCommonWithFlags(
 }
 
 function getParamsSn76489(d: DataView) {
-  const obj = getParamsCommonWithFlags(d, 0x08, 0x2b);
+  const obj = getParamsCommonWithFlags(d, 0x0c, 0x2b);
   if (obj) {
     return {
       ...obj,
@@ -226,12 +226,16 @@ export default class VGMParser {
       ym2413: getParamsCommon(d, 0x10),
     };
 
+    const eof = d.getUint32(0x04, true);
+    const gd3 = d.getUint32(0x14, true);
+    const loop = d.getUint32(0x1c, true);
+
     const vgm = {
       version,
       offsets: {
-        eof: 0x04 + d.getUint32(0x04, true),
-        gd3: 0x14 + d.getUint32(0x14, true),
-        loop: 0x1c + d.getUint32(0x1c, true),
+        eof: eof ? 0x04 + eof : 0,
+        gd3: gd3 ? 0x14 + gd3 : 0,
+        loop: loop ? 0x1c + loop : 0,
         data: 0x40,
         extraHeader: 0,
       },

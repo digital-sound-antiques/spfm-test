@@ -1,126 +1,95 @@
-import SerialPort from "serialport";
-import VGMPlayer from "./vgm-player";
-import VGMParser from "./vgm-parser";
-
 import fs from "fs";
 import zlib from "zlib";
 
-async function setup() {
-  const ports = await SerialPort.list();
-  console.log(ports);
-}
+import SPFM from "./spfm";
+import VGMPlayer from "./vgm-player";
+import VGMParser from "./vgm-parser";
+import config from "./config";
+import VGM from "./vgm";
 
 async function sleep(msec: number) {
-  return new Promise(function(resolve) {
+  return new Promise(resolve => {
     setTimeout(resolve, msec);
   });
 }
 
-async function test() {
-  await setup();
+function printUsage() {
+  console.info(`Usage: spfm-test VGMFILE`);
+}
 
-  const port = new SerialPort("/dev/tty.usbserial-AL03BAAX", {
-    baudRate: 1500000,
-  });
+async function createSPFMObjects() {
+  const ports = await SPFM.list();
+  if (ports.length === 0) {
+    console.log("Missing serial device");
+    process.exit(0);
+  }
+  const spfms: { [key: string]: SPFM } = {};
+  for (const key in Object.keys(config.devices)) {
+    const { comName, baudRate } = config.devices[key];
+    const path = comName !== "*" ? comName : ports[0].comName;
+    const spfm = new SPFM(path, baudRate);
+    try {
+      console.log(`Connecting: ${path}`);
+      await spfm.open();
+      spfms[key] = spfm;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return spfms;
+}
 
-  port.on("error", function(err) {
-    console.log("Error: ", err.message);
-  });
-
-  port.setEncoding("utf-8");
-
-  await portWrite(port, [0xff]);
-  await portVerify(port, "LT");
-  await sleep(100);
-  await portWrite(port, [0xfe]);
-  await portVerify(port, "OK");
-  await sleep(500);
-
-  const input = process.argv[2];
-  console.log(input);
-  const buf = fs.readFileSync(input);
+function loadVgm(input: string) {
   let vgmContext: Buffer;
+  const buf = fs.readFileSync(input);
   const m = input.match(/(.*)\.vgz$/);
   if (m) {
     vgmContext = zlib.gunzipSync(buf);
   } else {
     vgmContext = buf;
   }
+  return VGMParser.parse(vgmContext!.buffer);
+}
 
-  const vgm = VGMParser.parse(vgmContext!.buffer);
-  console.log(vgm);
-  const player = new VGMPlayer(port);
-  player.setData(vgm);
+async function silentSPFMObjects(spfms: { [key: string]: SPFM }) {
+  for (let key in spfms) {
+    const spfm = spfms[key];
+    await spfm.reset();
+  }
+}
+
+async function main() {
+  let vgm: VGM;
+
+  const input = process.argv[2];
+  if (!input) {
+    printUsage();
+    process.exit(0);
+  }
+  try {
+    vgm = loadVgm(input);
+    console.log(vgm);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
+
+  const spfms = await createSPFMObjects();
+  if (Object.keys(spfms).length === 0) {
+    console.error("No SPFM device found.");
+    process.exit(1);
+  }
+
+  const player = new VGMPlayer(spfms);
+  player.setData(vgm!);
 
   process.on("SIGINT", async () => {
-    console.log("Ctrl+C pressed.");
-    if (port.isOpen) {
-      await portWrite(port, [0xfe]);
-      port.close();
-    }
-    process.exit();
+    await silentSPFMObjects(spfms);
+    process.exit(0);
   });
 
   await player.exec();
-
-  await portWrite(port, [0xfe]);
-  port.close();
-
-  // await portWrite(port, [
-  //   0x00,
-  //   0x00,
-  //   0x20,
-  //   0x00, // KEY OFF
-  //   0x00,
-  //   0x00,
-  //   0x30,
-  //   0x70, // @1 V15
-  //   0x00,
-  //   0x00,
-  //   0x10,
-  //   172, // TONE C
-  //   0x00,
-  //   0x00,
-  //   0x20,
-  //   0x16, // KEYON OCT2
-  // ]);
-  // await sleep(30000);
-  // await portWrite(port, [
-  //   0x00,
-  //   0x00,
-  //   0x20,
-  //   0x04, // KEYOFF OCT2
-  // ]);
+  await silentSPFMObjects(spfms);
 }
 
-async function portVerify(port: SerialPort, s: string) {
-  return new Promise(async function(resolve, reject) {
-    let d = port.read(s.length);
-    while (d == null) {
-      console.log("WAIT");
-      await sleep(100);
-      d = port.read(s.length);
-    }
-    if (d !== s) {
-      console.log("FAIL");
-      reject();
-      return;
-    }
-    console.log("PASS");
-    return resolve();
-  });
-}
-
-async function portWrite(port: SerialPort, data: string | number[] | Buffer) {
-  return new Promise(function(resolve, reject) {
-    port.write(data, function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-
-test();
+main();
