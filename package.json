@@ -1,0 +1,26 @@
+{
+  "name": "spfm-driver",
+  "version": "0.1.0",
+  "main": "index.js",
+  "author": "Mitsutaka Okazaki",
+  "license": "MIT",
+  "scripts": {
+    "tslint-check": "tslint-config-prettier-check ./tslint.json"
+  },
+  "dependencies": {
+    "@types/microtime": "^2.1.0",
+    "@types/serialport": "^7.0.3",
+    "@types/sleep": "0.0.7",
+    "microtime": "^3.0.0",
+    "serialport": "^7.1.5",
+    "sleep": "^6.1.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.17.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.4.5"
+  }
+}
