@@ -6,6 +6,7 @@ It is tested only with:
 - node v10.10.0 on Windows 10
 - SPFM Light
 - Re:Birth YM2413, AY8910 and YM2203 module.
+
 Currently this may not work with node v12.x.
 
 TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタディです。
@@ -14,6 +15,7 @@ TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタデ�
 - node v10.10.0 on Windows 10
 - SPFM Light
 - Re:Birth YM2413, AY8910, YM2203 モジュール。
+
 現在、node v12.x には対応していません。
 
 [spfm light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
