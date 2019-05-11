@@ -1,24 +1,29 @@
 # SPFM-TEST
 
 A study of VGM player program for [SPFM Light] implemented with TypeScript.
-It is tested only with:
+[spfm light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
+
+The tested environments are:
 - node v11.15.0 on macOS 10.14.4
 - node v10.10.0 on Windows 10
+- node v12.2.0 on Debian9 (on VirtualBox)
+
+The tested hardwares are:
 - SPFM Light
 - Re:Birth YM2413, AY8910 and YM2203 module.
 
-Currently this may not work with node v12.x.
-
 TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタディです。
-テストは以下の環境でのみ行っています。
-- mac OS 10.14.4 & node v11.15.0
+
+次の環境で動作確認しています。
+
+- node v11.15.0 on mac OS 10.14.4
 - node v10.10.0 on Windows 10
+- node v12.2.0 on Debian9 (on VirtualBox)
+
+ハードウェア側は以下でテストしています。
+
 - SPFM Light
 - Re:Birth YM2413, AY8910, YM2203 モジュール。
-
-現在、node v12.x には対応していません。
-
-[spfm light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
 
 # インストール / Install
 
@@ -56,9 +61,11 @@ const config: Config = {
 };
 ```
 
-# Run
+# 実行 / Run
 
-Connect your SPFM to your machine and type the following command to play a vgm file through the SPFM device.
+Connect your SPFM Light to your machine and type the following command to play a vgm file through the SPFM device.
+
+SPFM Light を手持ちの端末に接続して、以下を実行してください。
 
 ```
 $ npm run spfm-test <vgmfile>
