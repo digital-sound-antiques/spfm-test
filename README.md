@@ -1,7 +1,8 @@
 # SPFM-TEST
 
 A study of VGM player program for [SPFM Light] implemented with TypeScript.
-[spfm light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
+
+[SPFM Light]: http://www.pyonpyon.jp/~gasshi/fm/spfmlight.html
 
 The tested environments are:
 - node v11.15.0 on macOS 10.14.4
