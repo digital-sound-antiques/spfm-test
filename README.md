@@ -54,8 +54,8 @@ const config: Config = {
     ym2608: { device: 0, slot: 0, clock: 4000000 }, // Implemented but not tested!
     ym2203: { device: 0, slot: 1, clock: 4000000 },
     ym2151: { device: 0, slot: 0, clock: 4000000 }, // Implemented but not tested!
-    ym3526: { device: 0, slot: 0, clock: 4000000 }, // Implemented but not tested!
-    ym3812: { device: 0, slot: 0, clock: 4000000 }, // Implemented but not tested!
+    ym3526: { device: 0, slot: 0, clock: 4000000 },
+    ym3812: { device: 0, slot: 0, clock: 4000000 },
     sn76489: { device: 0, slot: 0, clock: 3579545 }, // Implemented but not tested!
   },
   sleepMethod: "busyLoop",
