@@ -11,7 +11,7 @@ The tested environments are:
 
 The tested hardwares are:
 - SPFM Light
-- Re:Birth YM2413, AY8910 and YM2203 module.
+- Re:Birth YM2413, AY8910, YM3812/3526 and YM2203 module.
 
 TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタディです。
 
@@ -24,7 +24,7 @@ TypeScript で作成した [SPFM Light] 用の VGM プレイヤーのスタデ�
 ハードウェア側は以下でテストしています。
 
 - SPFM Light
-- Re:Birth YM2413, AY8910, YM2203 モジュール。
+- Re:Birth YM2413, AY8910, YM3812/3526, YM2203 モジュール。
 
 # インストール / Install
 
