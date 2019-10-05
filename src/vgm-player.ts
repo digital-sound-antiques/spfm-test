@@ -106,18 +106,39 @@ export default class VGMPlayer {
     const d = this._readByte();
   }
   _writeSn76489() {
-    const { device, slot } = config.modules.sn76489;
     const d = this._readByte();
+
+    const mod = config.modules.sn76489;
+    if (!mod) return;
+    const { device, slot } = mod;
     const spfm = this._spfms[device];
     if (spfm) {
       return spfm.writeSn76489(slot, d);
     }
   }
 
-  async _write(chip: string, port: number = 0) {
-    const { device, slot } = config.modules[chip];
+  async _write2(chip: string) {
+    const p = this._readByte();
     const a = this._readByte();
     const d = this._readByte();
+
+    const mod = config.modules[chip];
+    if (!mod) return;
+    const { device, slot } = mod;
+    const spfm = this._spfms[device];
+    if (spfm) {
+      return spfm.writeReg(slot, p, a, d);
+    }
+    return;
+  }
+
+  async _write(chip: string, port: number = 0) {
+    const a = this._readByte();
+    const d = this._readByte();
+
+    const mod = config.modules[chip];
+    if (!mod) return;
+    const { device, slot } = mod;
     const spfm = this._spfms[device];
     if (spfm) {
       return spfm.writeReg(slot, port, a, d);
@@ -183,6 +204,8 @@ export default class VGMPlayer {
         await this._write("ay8910");
       } else if (d == 0xb4) {
         await this._write("nesApu");
+      } else if (d == 0xd2) {
+        await this._write2("scc1");
       } else if (d == 0xe0) {
         await this._seekPcmDataBank();
       } else if (0x70 <= d && d <= 0x7f) {
