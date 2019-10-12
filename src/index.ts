@@ -40,6 +40,10 @@ async function createSPFMObjects() {
   return spfms;
 }
 
+function toArrayBuffer(b: Buffer) {
+  return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength);
+}
+
 function loadVgm(input: string) {
   let vgmContext: Buffer;
   const buf = fs.readFileSync(input);
@@ -48,7 +52,7 @@ function loadVgm(input: string) {
   } catch (e) {
     vgmContext = buf;
   }
-  return VGMParser.parse(vgmContext!.buffer);
+  return VGMParser.parse(toArrayBuffer(vgmContext));
 }
 
 async function silentSPFMObjects(spfms: { [key: string]: SPFM }) {
