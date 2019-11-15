@@ -1,7 +1,8 @@
-import VGM from "./vgm";
-import SPFM from "./spfm";
-import config from "./config";
 import microtime from "microtime";
+
+import config from "./config";
+import SPFM from "./spfm";
+import VGM from "./vgm";
 
 const performance = {
   now: () => microtime.now() / 1000,
@@ -82,8 +83,10 @@ export default class VGMPlayer {
 
   _sarray = new Int32Array(new SharedArrayBuffer(4));
   _lastWaitSamplesCalled = 0;
+  _currentFrame = 0;
 
   async _waitSamples(frames: number) {
+    this._currentFrame += frames;
     if (this._lastWaitSamplesCalled) {
       this._waitRequested -= performance.now() - this._lastWaitSamplesCalled;
     }
@@ -154,12 +157,65 @@ export default class VGMPlayer {
     return offset;
   }
 
+  async _YM2608RamWrite(address: number, data: number[]) {
+    let start = address;
+    let stop = start + data.length - 1;
+    const limit = 0xffff;
+
+    console.log(
+      "YM2608 RAM Write [start=" + start + " size=" + data.length + "]"
+    );
+
+    start >>= 5;
+    stop >>= 5;
+
+    const mod = config.modules["ym2608"];
+    if (mod) {
+      const { device, slot } = mod;
+      const spfm = this._spfms[device];
+      if (spfm) {
+        await spfm.writeReg(slot, 1, 0x10, 0x13); // BRDY EOS Enable
+        await spfm.writeReg(slot, 1, 0x10, 0x80); // Rest Flags
+        await spfm.writeReg(slot, 1, 0x00, 0x60); // Memory Write
+        await spfm.writeReg(slot, 1, 0x01, 0x02); // Memory Type
+        await spfm.writeReg(slot, 1, 0x02, start & 0xff);
+        await spfm.writeReg(slot, 1, 0x03, start >> 8);
+        await spfm.writeReg(slot, 1, 0x04, stop & 0xff);
+        await spfm.writeReg(slot, 1, 0x05, stop >> 8);
+        await spfm.writeReg(slot, 1, 0x0c, limit & 0xff);
+        await spfm.writeReg(slot, 1, 0x0d, limit >> 8);
+
+        for (let i = 0; i < data.length; i++) {
+          await spfm.writeReg(slot, 1, 0x08, data[i]);
+          await spfm.writeReg(slot, 1, 0x10, 0x1b);
+          await spfm.writeReg(slot, 1, 0x10, 0x13);
+        }
+        await spfm.writeReg(slot, 1, 0, 0x00);
+        await spfm.writeReg(slot, 1, 0x10, 0x80);
+      }
+    }
+  }
+
+  async _processYM2608DeltaPCMData(block: { type: number; size: number }) {
+    let romSize = this._readDword();
+    let address = this._readDword();
+    const data = Array<number>();
+    for (let i = 0; i < block.size - 8; i++) {
+      data.push(this._readByte());
+    }
+    await this._YM2608RamWrite(address, data);
+  }
+
   async exec() {
     while (!this._eos && this._index < this._data!.byteLength) {
       const d = this._readByte();
       if (d == 0x67) {
         var block = this._processDataBlock();
-        this._index += block.size;
+        if (block.type == 0x81) {
+          await this._processYM2608DeltaPCMData(block);
+        } else {
+          this._index += block.size;
+        }
       } else if (d == 0x61) {
         this._waitSamples(this._readWord());
       } else if (d == 0x62) {
