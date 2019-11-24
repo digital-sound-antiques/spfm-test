@@ -1,4 +1,4 @@
-This project is obsolete. New [node-spfm](https://github.com/digital-sound-antiques/node-spfm) is available.
+This project is experimental and obsolete. New [node-spfm](https://github.com/digital-sound-antiques/node-spfm) is available.
 
 # SPFM-TEST
 
