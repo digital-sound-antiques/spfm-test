@@ -1,3 +1,5 @@
+This project is obsolete. New [node-spfm](https://github.com/digital-sound-antiques/node-spfm) is available.
+
 # SPFM-TEST
 
 A study of VGM player program for [SPFM Light] implemented with TypeScript.
